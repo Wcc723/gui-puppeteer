@@ -1,7 +1,8 @@
 export default {
-  "url": "http://localhost:5000/order/create?coupon_code=2021_HEXSCHOOL_COUPON_2&order=bootstrap",
+  "host": "http://localhost:5000/",
+  "query": "order/create/?coupon_code=2021_HEXSCHOOL_COUPON_2&order=bootstrap",
   "title": "金流頁面測試",
-  "flow": [
+  "flows": [
     {
       "method": "waitForTimeout",
       "parameter": 1000
@@ -74,7 +75,8 @@ export default {
     },
     {
       "method": "waitForSelector",
-      "parameter": "body > div > div.d-flex.justify-content-center.mb-4 > a.fab.fab-line.mp-click.mx-1"
+      "parameter": "body > div > div.d-flex.justify-content-center.mb-4 > a.fab.fab-line.mp-click.mx-1",
+      "message": "結帳流程"
     }
   ]
 }
