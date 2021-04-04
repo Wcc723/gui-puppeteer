@@ -14,10 +14,11 @@ module.exports = async function (sample) {
   await page.goto(`${sample.host}${sample.query}`);
   console.log('goto');
 
+  let event = {}
   try {
-    console.log('try');
+    console.log('start testing');
     for (let index = 0; index < sample.flows.length; index++) {
-      const event = sample.flows[index];
+      event = sample.flows[index];
       console.log(event.method, event.parameter, page[event.method]);
       if (!Array.isArray(event.parameter)) {
         await page[event.method](event.parameter)
@@ -26,8 +27,18 @@ module.exports = async function (sample) {
       }
     }
   } catch (err) {
-    console.log(err);
-    return err;
+    const errorMessage = {
+      success: false,
+      message: err.toString(),
+      userMessage: event.message,
+    }
+    console.log('Catch Error:', errorMessage);
+    throw errorMessage;
   }
-  return `${sample.title} 完成`;
+
+  await browser.close();
+  return {
+    success: true,
+    message: `${sample.title} 完成`,
+  };
 };

@@ -18,18 +18,32 @@
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
     <!-- axios -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <!-- mitt -->
+    <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
+
+    <!-- Bootstrap -->
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
   </head>
   <body>
     <div id="app" class="container my-3">
-      <work-component></work-component>
+      <toast-message></toast-message>
+      <router-view></router-view>
     </div>
     <script type="module">
-    import workComponent from '/javascripts/workComponent.js';
     import router from '/javascripts/router.js';
+    import toastMessage from '../javascripts/components/toastMessage.js';
+
+    const emitter = mitt();
 
     const app = Vue.createApp({
+      provide() {
+        return {
+          emitter,
+        };
+      },
       components: {
-        workComponent
+        toastMessage
       }
     })
     app.component('draggable', vuedraggable);

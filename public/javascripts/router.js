@@ -7,6 +7,10 @@ const routes = [
     component: listComponent
   },
   {
+    path: '/worker',
+    component: workComponent
+  },
+  {
     path: '/worker/:id',
     component: workComponent
   }

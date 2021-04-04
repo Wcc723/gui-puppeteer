@@ -24,4 +24,12 @@ export default {
     parameterType: 'array',
     parameterDescription: ['元素 DOM', '輸入的內容']
   },
+  screenshot: {
+    name: 'screenshot',
+    description: '目前畫面截圖',
+    parameterType: 'static',
+    parameterContent: {
+      path: `screenshots/${new Date().getTime()}.png`,
+    }
+  }
 }

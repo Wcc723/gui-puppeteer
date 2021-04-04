@@ -1,4 +1,4 @@
-import pupeteerMethods from '/javascripts/puppeteer-metods.js';
+import puppeteerMethods from '/javascripts/puppeteer-metods.js';
 import firebaseRefs from '/javascripts/databaseRefs.js';
 
 export default {
@@ -8,15 +8,16 @@ export default {
         host: '',
         query: '',
         title: '',
-        flows: []
+        flows: [{}]
       },
       arrays: [{id:1}, {id:2}, {id: 3}],
-      pupeteerMethods,
+      puppeteerMethods,
     };
   },
+  inject: ['emitter'],
   methods: {
     updateMethod(flow) {
-      if (this.pupeteerMethods[flow.method]?.parameterType === 'array') {
+      if (this.puppeteerMethods[flow.method]?.parameterType === 'array') {
         flow.parameter = ['', ''];
       }
     },
@@ -37,23 +38,33 @@ export default {
     },
     saveWorker() {
       if (!this.work.id) {
-        this.work.id = refs.workerRef.push().key;
+        this.work.id = firebaseRefs.workerRef.push().key;
       }
-      refs.workerRef.child(this.work.id).set(this.work);
+      firebaseRefs.workerRef.child(this.work.id).set(this.work);
     },
     startTesting() {
       axios.post('/start-test', this.work)
         .then(res => {
-          console.log(res);
+          this.emitter.emit('push-message', {
+            title: res.data.success ? '運行完成' : '運行失敗',
+            style: res.data.success ? 'success' : 'danger',
+            content: res.data.message
+          });
         })
     },
   },
   created() {
-    const defaultWorkId = '-MWqoIazkNF6Hb6gfq2T';
-    firebaseRefs.workerRef.child(defaultWorkId).on('value', (snapshot) => {
-      this.work = snapshot.val();
-      console.log(this.work);
-    })
+    const id = this.$route.params.id;
+    console.log(this.$route.params);
+    if (id) {
+      firebaseRefs.workerRef.child(id).on('value', (snapshot) => {
+        this.work = snapshot.val();
+        if (!this.work.flows) {
+          this.work.flows = [{}];
+        }
+      });
+    }
+    console.log(this.emitter);
   },
   template: `<div class="row">
     <div class="col">
@@ -94,7 +105,7 @@ export default {
                       v-model="element.method"
                       @change="updateMethod(element)"
               >
-                <option :value="item.name" v-for="item in pupeteerMethods"
+                <option :value="item.name" v-for="item in puppeteerMethods"
                         :key="item.name">
                   {{ item.name }}
                   {{ item.description }}
@@ -107,31 +118,43 @@ export default {
         <div class="col-5"><!-- 參數 -->
           <!-- 當方法不為陣列 -->
           <div class="form-floating mb-3"
-            v-if="pupeteerMethods[element.method]?.parameterType !== 'array'
-            && pupeteerMethods[element.method]">
+            v-if="puppeteerMethods[element.method]?.parameterType === 'string'
+            && puppeteerMethods[element.method]">
             <input type="text" class="form-control"
-            v-if="pupeteerMethods[element.method]?.parameterType === 'string'" v-model="element.parameter">
+            v-if="puppeteerMethods[element.method]?.parameterType === 'string'" v-model="element.parameter">
             <input type="text" class="form-control"
-            v-else-if="pupeteerMethods[element.method]?.parameterType === 'number'" v-model.number="element.parameter">
-            <label for="floatingInput">{{ pupeteerMethods[element.method].parameterDescription }}</label>
+            v-else-if="puppeteerMethods[element.method]?.parameterType === 'number'" v-model.number="element.parameter">
+            <label for="floatingInput">{{ puppeteerMethods[element.method].parameterDescription }}</label>
           </div>
-
+          <!-- 當為固定方法 -->
+          <div v-else-if="puppeteerMethods[element.method]?.parameterType === 'static'">
+            <div class="form-floating flex-fill">
+              <select class="form-select" v-model="element.parameter">
+                <option value="" disabled selected>請選擇</option>
+                <option :value="puppeteerMethods[element.method].parameterContent">
+                  {{ puppeteerMethods[element.method].parameterContent }}
+                </option>
+              </select>
+              <label>請選擇固定選項</label>
+            </div>
+          </div>
           <!-- 當方法為陣列 -->
-          <div class="row" v-if="pupeteerMethods[element.method]?.parameterType === 'array'
+          <div class="row" v-else-if="puppeteerMethods[element.method]?.parameterType === 'array'
             && element?.parameter?.length">
             <div class="col-6">
               <div class="form-floating mb-3">
                 <input type="text" class="form-control" v-model="element.parameter[0]">
-                <label>{{ pupeteerMethods[element.method].parameterDescription[0] }}</label>
+                <label>{{ puppeteerMethods[element.method].parameterDescription[0] }}</label>
               </div>
             </div>
             <div class="col-6">
               <div class="form-floating mb-3">
                 <input type="text" class="form-control" v-model="element.parameter[1]">
-                <label>{{ pupeteerMethods[element.method].parameterDescription[1] }}</label>
+                <label>{{ puppeteerMethods[element.method].parameterDescription[1] }}</label>
               </div>
             </div>
           </div>
+          
         </div>
 
         <div class="col-3">
@@ -150,7 +173,8 @@ export default {
       新增項目
     </button>
   </div>
-  <div class="text-end mt-3">
+  <div class="d-flex justify-content-end mt-3">
+    <router-link class="btn btn-outline-secondary me-auto" to="/list">返回前頁</router-link>
     <button class="btn btn-outline-success me-2" @click="saveWorker">儲存工作</button>
     <button class="btn btn-primary" type="button" @click="startTesting">
       開始測試
