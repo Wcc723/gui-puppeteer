@@ -43,7 +43,12 @@ export default {
       firebaseRefs.workerRef.child(this.work.id).set(this.work);
     },
     startTesting() {
-      axios.post('/start-test', this.work)
+      const timestamp = new Date().getTime();
+      const work = {
+        ...this.work,
+        timestamp
+      }
+      axios.post('/start-test', work)
         .then(res => {
           this.emitter.emit('push-message', {
             title: res.data.success ? '運行完成' : '運行失敗',

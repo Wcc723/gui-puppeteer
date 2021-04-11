@@ -15,7 +15,12 @@ export default {
     });
     const emitter = Vue.inject('emitter');
 
-    function startWorker(work) {
+    function startWorker(item) {
+      const timestamp = new Date().getTime();
+      const work = {
+        ...item,
+        timestamp
+      }
       axios.post('/start-test', work)
         .then(res => {
           // TODO: 為什麼不會動

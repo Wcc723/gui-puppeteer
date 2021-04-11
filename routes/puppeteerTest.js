@@ -1,9 +1,9 @@
 const worker = require('./worker');
 
-async function puppeteerTest(data) {
+async function puppeteerTest(data, timestamp) {
   console.log('=== 開始測試 ===');
   try {
-    return await worker(data);
+    return await worker(data, timestamp);
   } catch (err) {
     console.log('puppeteerTest err:', err);
     throw err;
