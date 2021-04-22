@@ -1,4 +1,4 @@
-import toast from './taost.js';
+import toast from './toast.js';
 
 export default {
   template: `<div class="toast-container position-fixed pe-3 end-0"
