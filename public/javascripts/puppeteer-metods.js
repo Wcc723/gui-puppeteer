@@ -24,6 +24,12 @@ export default {
     parameterType: 'array',
     parameterDescription: ['元素 DOM', '輸入的內容']
   },
+  select: {
+    name: 'select',
+    description: '選項',
+    parameterType: 'array',
+    parameterDescription: ['元素 DOM', '選項的值']
+  },
   screenshot: {
     name: 'screenshot',
     description: '目前畫面截圖',
@@ -31,5 +37,15 @@ export default {
     parameterContent: {
       path: `screenshots/${new Date().getTime()}.png`,
     }
+  },
+  waitForNavigation: {
+    name: 'waitForNavigation',
+    description: '等待跳轉',
+    parameterType: 'none'
   }
+  // waitForFunction: {
+  //   name: 'waitForFunction',
+  //   description: '等待特定行為完成',
+  //   parameterType: 'function',
+  // }
 }

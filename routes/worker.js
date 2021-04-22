@@ -23,10 +23,6 @@ module.exports = async function (sample, id) {
 
   console.log(sample, `${sample.host}${sample.query}`, id);
   await page.goto(`${sample.host}${sample.query}`);
-  logRef.child(id).set({
-    title: sample.title,
-    host: sample.host,
-  })
 
   let event = {}
   try {
@@ -54,6 +50,7 @@ module.exports = async function (sample, id) {
   }
 
   await browser.close();
+  addNewLog(id, `${sample.title} 完成`, true);
   return {
     success: true,
     message: `${sample.title} 完成`,

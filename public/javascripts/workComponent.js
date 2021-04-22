@@ -1,5 +1,6 @@
 import puppeteerMethods from '/javascripts/puppeteer-metods.js';
 import firebaseRefs from '/javascripts/databaseRefs.js';
+import reportComponent from './reportComponent.js';
 
 export default {
   data() {
@@ -13,6 +14,9 @@ export default {
       arrays: [{id:1}, {id:2}, {id: 3}],
       puppeteerMethods,
     };
+  },
+  components: {
+    reportComponent,
   },
   inject: ['emitter'],
   methods: {
@@ -48,6 +52,7 @@ export default {
         ...this.work,
         timestamp
       }
+      this.emitter.emit('get-logs', work.timestamp);
       axios.post('/start-test', work)
         .then(res => {
           this.emitter.emit('push-message', {
@@ -124,7 +129,7 @@ export default {
           <!-- 當方法不為陣列 -->
           <div class="form-floating mb-3"
             v-if="puppeteerMethods[element.method]?.parameterType === 'string'
-            && puppeteerMethods[element.method]">
+            || puppeteerMethods[element.method]?.parameterType === 'number'">
             <input type="text" class="form-control"
             v-if="puppeteerMethods[element.method]?.parameterType === 'string'" v-model="element.parameter">
             <input type="text" class="form-control"
@@ -141,6 +146,12 @@ export default {
                 </option>
               </select>
               <label>請選擇固定選項</label>
+            </div>
+          </div>
+          <!-- 當為沒有項目需要填寫 -->
+          <div v-else-if="puppeteerMethods[element.method]?.parameterType === 'none'">
+            <div class="form-floating flex-fill">
+              不需選擇
             </div>
           </div>
           <!-- 當方法為陣列 -->
@@ -184,5 +195,6 @@ export default {
     <button class="btn btn-primary" type="button" @click="startTesting">
       開始測試
     </button>
-  </div>`
+  </div>
+  <reportComponent></reportComponent>`
 }

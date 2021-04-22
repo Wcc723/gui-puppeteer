@@ -33,8 +33,8 @@ router.post('/start-test', function(req, res, next) {
 
 router.post('/multi-start', function(req, res, next) {
   const data = req.body;
-  console.log(data);
-  tester.multiplePuppeteerTest(data)
+  const { timestamp, works } = data;
+  tester.multiplePuppeteerTest(works, timestamp)
     .then(response=> {
       console.log('/start-test success', response);
       res.send(response)

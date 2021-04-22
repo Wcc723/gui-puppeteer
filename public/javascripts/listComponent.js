@@ -1,11 +1,13 @@
-import firebaseRefs from '/javascripts/databaseRefs.js';
+import firebaseRefs from './databaseRefs.js';
 import sequenceWorksComponent from './sequenceWorksComponent.js';
 import sequenceWorksLists from './sequenceWorksLists.js';
+import reportComponent from './reportComponent.js';
 
 export default {
   components: {
     sequenceWorksComponent,
     sequenceWorksLists,
+    reportComponent,
   },
   setup() {
     const list = Vue.ref([]);
@@ -21,6 +23,7 @@ export default {
         ...item,
         timestamp
       }
+      emitter.emit('get-logs', work.timestamp);
       axios.post('/start-test', work)
         .then(res => {
           // TODO: 為什麼不會動
@@ -115,5 +118,6 @@ export default {
         :works="list"></sequence-works-component>
     </div>
   </div>
+  <reportComponent></reportComponent>
   `
 };

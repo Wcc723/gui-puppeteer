@@ -9,5 +9,6 @@ const database = firebase.database();
 const refs = {};
 refs.workerRef = database.ref('/workers');
 refs.sequenceWorksRef = database.ref('/sequenceWorks');
+refs.logsRef = database.ref('/logs');
 
 export default refs;

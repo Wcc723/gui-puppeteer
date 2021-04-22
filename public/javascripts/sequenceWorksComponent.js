@@ -8,16 +8,36 @@ export default {
   setup(props) {
     const tempWorks = Vue.ref([]);
     const work = Vue.ref({});
+    const emitter = Vue.inject('emitter');
     Vue.watch(props.sequenceWorks, (first, second)=> {
-      tempWorks.value = props.sequenceWorks.works.map(item => props.works[item.id]);
+      tempWorks.value = props.sequenceWorks.works.map(item => {
+        return {
+          timestamp: item.timestamp,
+          ...props.works[item.id]
+        };
+      });
       work.value = { ...props.sequenceWorks }
     })
 
     function startMultiTest() {
-      axios.post('/multi-start', tempWorks.value)
+      const timestamp = new Date().getTime();
+      console.log(tempWorks.value);
+      emitter.emit('get-logs', timestamp);
+      axios.post('/multi-start', {
+        works: tempWorks.value,
+        timestamp,
+      })
         .then(res=> {
           console.log(res);
         })
+    }
+
+    function removeWork(work) {
+      tempWorks.value.forEach((item, key) => {
+        if (item.timestamp === work.timestamp) {
+          tempWorks.value.splice(key, 1);
+        }
+      })
     }
 
     function saveSequenceWorks() {
@@ -35,6 +55,7 @@ export default {
       work,
       startMultiTest,
       saveSequenceWorks,
+      removeWork,
     }
   },
   template: `<h2>序列任務</h2>
@@ -52,7 +73,7 @@ export default {
         <button type="button" class="btn btn-outline-secondary btn-sm">
           <i class="bi bi-grip-vertical"></i>
         </button>
-        <button class="btn btn-outline-danger" type="button">
+        <button class="btn btn-outline-danger" type="button" @click="removeWork(element)">
           <i class="bi bi-x"></i>
         </button>
       </div>   
